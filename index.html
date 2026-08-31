@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programação Semanal · Aderência das Caminhadas — FICO Infra</title>
+<style>
+:root{
+  --navy:#142A4C; --navy2:#1E3A63; --laranja:#F89B32; --laranja2:#FFB259; --azul:#3578BC; --azul2:#4A90D9;
+  --verde:#2E9B4E; --amarelo:#F4C430; --vermelho:#D14545;
+  --cinza-bg:#EEF1F6; --cinza-borda:#E1E6EE; --cinza-txt:#5A6A7E;
+  --branco:#FFFFFF; --preto:#1A1A1A;
+  --sh-sm:0 2px 6px rgba(20,42,76,.08);
+  --sh-md:0 6px 20px rgba(20,42,76,.12);
+  --sh-lg:0 14px 40px rgba(20,42,76,.16);
+  --sh-navy:0 10px 30px rgba(20,42,76,.35);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{
+  background:
+    radial-gradient(1200px 600px at 80% -10%, rgba(53,120,188,.10), transparent 60%),
+    radial-gradient(900px 500px at -5% 20%, rgba(248,155,50,.08), transparent 55%),
+    var(--cinza-bg);
+  font-family:'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:var(--preto);
+  font-size:14px;-webkit-font-smoothing:antialiased;min-height:100vh;
+}
+.app{max-width:1300px;margin:0 auto;padding:0 26px 48px}
+header.topo{
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 55%,#24467a 100%);
+  color:#fff;padding:26px 34px;border-radius:0 0 18px 18px;position:relative;overflow:hidden;
+  box-shadow:var(--sh-navy);margin-bottom:22px;
+}
+header.topo::before{content:"";position:absolute;left:0;top:0;bottom:0;width:10px;
+  background:linear-gradient(180deg,var(--laranja),var(--laranja2));box-shadow:2px 0 12px rgba(248,155,50,.5)}
+header.topo::after{content:"";position:absolute;right:-80px;top:-120px;width:400px;height:400px;
+  background:radial-gradient(circle,rgba(53,120,188,.35),transparent 70%);border-radius:50%}
+header.topo .top-row{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;position:relative;z-index:2;flex-wrap:wrap}
+header.topo a.voltar{color:#fff;text-decoration:none;font-size:12.5px;font-weight:700;background:rgba(255,255,255,.14);
+  padding:8px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.25)}
+header.topo a.voltar:hover{background:rgba(255,255,255,.22)}
+header.topo h1{font-size:22px;font-weight:800;margin-top:10px}
+header.topo p.sub{font-size:13px;color:rgba(255,255,255,.78);margin-top:4px}
+
+h2.secao{color:var(--navy);font-size:15px;font-weight:800;margin:30px 0 14px;
+  display:flex;align-items:center;gap:12px;text-transform:uppercase;letter-spacing:.6px}
+h2.secao::before{content:"";width:5px;height:22px;border-radius:3px;
+  background:linear-gradient(180deg,var(--laranja),var(--laranja2));box-shadow:0 2px 8px rgba(248,155,50,.4)}
+
+.ef-ajuda{color:var(--cinza-txt);font-size:12px;margin:0 0 10px}
+
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.kpi{background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm);position:relative;
+  overflow:hidden;border:1px solid rgba(225,230,238,.7)}
+.kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
+.kpi::after{content:"";position:absolute;right:-30px;bottom:-30px;width:110px;height:110px;
+  border-radius:50%;opacity:.06}
+.kpi.azul::before{background:linear-gradient(180deg,var(--azul),var(--azul2))} .kpi.azul::after{background:var(--azul)}
+.kpi.laranja::before{background:linear-gradient(180deg,var(--laranja),var(--laranja2))} .kpi.laranja::after{background:var(--laranja)}
+.kpi.verde::before{background:var(--verde)} .kpi.verde::after{background:var(--verde)}
+.kpi.vermelho::before{background:var(--vermelho)} .kpi.vermelho::after{background:var(--vermelho)}
+.kpi.navy::before{background:linear-gradient(180deg,var(--navy),var(--azul))} .kpi.navy::after{background:var(--navy)}
+.kpi .rot{font-size:10.5px;color:var(--cinza-txt);text-transform:uppercase;letter-spacing:.8px;font-weight:700;position:relative;z-index:2}
+.kpi .val{font-size:30px;font-weight:800;color:var(--navy);margin-top:6px;line-height:1;position:relative;z-index:2;
+  font-variant-numeric:tabular-nums}
+.kpi .sub{font-size:11px;color:var(--cinza-txt);margin-top:4px;position:relative;z-index:2}
+@media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}}
+
+.ps-empnav{display:flex;flex-wrap:wrap;gap:8px;background:var(--branco);border:1px solid var(--cinza-borda);
+  border-radius:12px;padding:8px;margin:14px 0 18px;box-shadow:var(--sh-sm)}
+.ps-empnav button{border:1px solid var(--cinza-borda);background:#fff;color:var(--cinza-txt);
+  padding:8px 16px;border-radius:999px;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;
+  transition:background .15s,color .15s,border-color .15s;display:inline-flex;align-items:center;gap:8px}
+.ps-empnav button:hover{background:rgba(20,42,76,.06);color:var(--navy)}
+.ps-empnav button.ativa{background:linear-gradient(135deg,var(--navy),var(--azul));color:#fff;border-color:transparent;
+  box-shadow:0 5px 14px rgba(20,42,76,.28)}
+.ps-empnav button .ps-badge{font-size:10px;font-weight:800;padding:1px 7px;border-radius:999px;background:var(--cinza-bg);color:var(--cinza-txt)}
+.ps-empnav button.ativa .ps-badge{background:rgba(255,255,255,.22);color:#fff}
+.ps-empnav button.ps-vazia{opacity:.55}
+.ps-bloco{background:#fff;border:1px solid var(--cinza-borda);border-radius:14px;padding:20px 22px;
+  box-shadow:var(--sh-sm);margin-bottom:18px}
+.ps-bloco h3{color:var(--navy);font-size:15px;font-weight:800;display:flex;align-items:center;gap:12px;margin-bottom:4px}
+.ps-vazio-msg{color:var(--cinza-txt);font-size:13px;padding:22px 4px;text-align:center}
+.ps-tab-caminhadas{width:100%;border-collapse:collapse;font-size:12px;min-width:900px;margin-top:6px}
+.ps-tab-caminhadas th,.ps-tab-caminhadas td{padding:8px 10px;border-bottom:1px solid var(--cinza-borda);text-align:center}
+.ps-tab-caminhadas th{color:#fff;background:var(--navy);font-size:10.5px;text-transform:uppercase;letter-spacing:.3px}
+.ps-tab-caminhadas td.ps-l,.ps-tab-caminhadas th.ps-l{text-align:left}
+.ps-tab-caminhadas tbody tr:hover{background:#f4f7fa}
+.ps-tab-caminhadas tfoot td{font-weight:800;background:#f4f7fa;color:var(--navy)}
+.ps-tab-caminhadas .ps-obs{color:var(--cinza-txt);font-weight:500;max-width:280px}
+.ps-pct{display:inline-flex;align-items:center;gap:6px;font-weight:800;font-variant-numeric:tabular-nums}
+.ps-pct::before{content:"";width:8px;height:8px;border-radius:50%;flex:none}
+.ps-pct.verde{color:var(--verde)} .ps-pct.verde::before{background:var(--verde);box-shadow:0 0 5px var(--verde)}
+.ps-pct.amarelo{color:#B9791A} .ps-pct.amarelo::before{background:var(--amarelo);box-shadow:0 0 5px var(--amarelo)}
+.ps-pct.vermelho{color:var(--vermelho)} .ps-pct.vermelho::before{background:var(--vermelho);box-shadow:0 0 5px var(--vermelho)}
+.ps-abertos{margin-top:16px}
+.ps-abertos h4{color:var(--navy);font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.ps-abertos ul{margin:0;padding-left:18px}
+.ps-abertos li{font-size:12.5px;color:var(--cinza-txt);margin-bottom:6px;line-height:1.5}
+.ps-legenda{display:flex;gap:18px;flex-wrap:wrap;font-size:11px;color:var(--cinza-txt);margin-top:4px}
+.ps-legenda span{display:inline-flex;align-items:center;gap:6px}
+.ps-legenda i{width:8px;height:8px;border-radius:50%;display:inline-block}
+@media(max-width:700px){.ps-bloco{padding:14px;overflow-x:auto}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topo">
+    <div class="top-row">
+      <div>
+        <a class="voltar" href="https://automacaofico.github.io/">← Central FICO</a>
+        <h1>Programação Semanal · Aderência das Caminhadas</h1>
+        <p class="sub">Ferrovia de Integração Centro-Oeste · Verificação de pendências em campo, por empresa executante</p>
+      </div>
+    </div>
+  </header>
+  <main id="main"></main>
+</div>
+
+<script>
+function escHtml(s){return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+const NOMES_EXIBICAO={GSA:'GRUPO GSA SERVICE'};
+function nomeExibicao(emp){return NOMES_EXIBICAO[emp]||emp;}
+
+// ============================================================
+// PROGRAMAÇÃO SEMANAL — aderência das caminhadas/reinspeções de verificação de
+// pendências, por empresa executante. Vem dos relatórios de caminhada dos grupos
+// de campo (não da planilha EAP nem do upload), fixo aqui. Atualizar a cada semana.
+//   inspecionadas = IDs reinspecionadas na caminhada
+//   atendidas     = IDs efetivamente fechadas/encerráveis na reinspeção
+//   naoAtendidas  = IDs reprovadas, voltam para tratativa em campo
+//   aguardando    = IDs travadas em terceiros (RC / SIT / projeto / NS)
+//   aderência (%) = atendidas ÷ inspecionadas
+// ============================================================
+const PROG_SEMANAL_ORDER=['ÁPIA','CIVIL MASTER','EMPA','ATERPA','SOMAFEL/CMC','GSA'];
+const PROG_SEMANAL={
+  semanaLabel:'Semana 24 a 29/08/2026',
+  atualizadoAte:'30/08/2026',
+  fonte:'Fonte: relatórios de caminhada / reinspeção dos grupos de verificação de pendências. Aderência = IDs fechadas ÷ IDs reinspecionadas.',
+  empresas:{
+    'EMPA':{
+      caminhadas:[
+        {data:'24/08',dia:'seg',frente:'Pacote 01 · Km 25+610 a 33+460',inspecionadas:19,atendidas:15,naoAtendidas:3,aguardando:1,obs:'1 ID não localizada em campo (ID-1171 — foto não corresponde ao local).'},
+        {data:'26/08',dia:'qua',frente:'Pacote 018 (Km 19+474 a 25+530) + Caminhada MA · Pct 1',inspecionadas:24,atendidas:11,naoAtendidas:11,aguardando:2,obs:'2 itens de MA aguardando aprovação do RC. 5 IDs eram repetidas de caminhadas anteriores.'},
+        {data:'28/08',dia:'sex',frente:'Pacote 01 · Km 36+000 a 38+990',inspecionadas:18,atendidas:13,naoAtendidas:4,aguardando:1,obs:'1 ID aguardando confirmação da SIT.'},
+        {data:'29/08',dia:'sáb',frente:'Pacote 01 · Km 35+000 a 38+000',inspecionadas:16,atendidas:9,naoAtendidas:6,aguardando:1,obs:'1 ID aguardando confirmação de projeto / nota de serviço.'}
+      ],
+      abertos:[
+        'Retrabalho: em 26/08, 5 IDs já haviam sido vistoriadas em caminhadas anteriores e seguem sem fechar — combinado double-check das IDs antes de solicitar a caminhada.',
+        'CLPs a atualizar com os e-mails da Aline de 20 e 24/08 — previsto para 31/08.',
+        'IDs com hidrossemeadura fora do escopo da Teixeira Duarte: só a confirmação (parte EMPA) encerra; avaliar adequação de CLP.',
+        '24 IDs reprovadas na semana retornam ao campo para tratativa; solicitar reinspeção só após a equipe de campo confirmar a conclusão.'
+      ]
+    },
+    'ÁPIA':{
+      caminhadas:[
+        {data:'25/08',dia:'ter',frente:'Segmento 2.1 · Pacote 03',inspecionadas:7,atendidas:3,naoAtendidas:2,aguardando:2,obs:'2 IDs aguardando verificação com o RC. Equipe verificou só 7 — inconsistências na planilha tratadas no escritório.'},
+        {data:'27/08',dia:'qui',frente:'Segmento 2.1 (IDs 2221, 2223, 2225, 2295)',inspecionadas:4,atendidas:4,naoAtendidas:0,aguardando:0,obs:'Pendências resolvidas na manhã e vistoriadas com foto; confirmadas como aprovadas em 28/08.'},
+        {data:'29/08',dia:'sáb',frente:'Reinspeção Pacote 03 · Km 74+000 a 84+516',inspecionadas:15,atendidas:9,naoAtendidas:5,aguardando:1,obs:'Não fechadas: 1341, 1342, 1346, 1953, 1956. ID 1340 aguardando SIT. Report tinha divergência (cabeçalho citava 12 fechadas).'}
+      ],
+      abertos:[
+        'Divergência de planilha: itens inspecionados em campo não recebem baixa no sistema; equipe remarca a caminhada até a baixa efetivar.',
+        'Fotos de execução antigas (seg. 1.7 / 2.2) sem georreferenciamento — croquis enviados como evidência; VALE pediu as fotos que a Ápia tiver.',
+        'Caminhada de 20/08 não ocorreu (equipe sem apoio de deslocamento / aviso em cima da hora) — combinado avisar as caminhadas com antecedência.',
+        '29/08: 5 IDs não fechadas voltam ao campo + ID 1340 aguardando confirmação da SIT.'
+      ]
+    },
+    'CIVIL MASTER':{
+      caminhadas:[],
+      abertos:[
+        'Sem caminhada de verificação de pendências na semana.',
+        'Tratativas registradas foram de execução em campo: reativação do antigo acesso ao C27; rebaixamento de talude no Km 22+650 com ponto de atenção nas cotas de corte (corte de regularização ultrapassando a cota de crista).'
+      ]
+    },
+    'ATERPA':{
+      caminhadas:[
+        {data:'27/08',dia:'qui',frente:'Reinspeção de entrega · PCT-02',inspecionadas:20,atendidas:18,naoAtendidas:2,aguardando:0,obs:'8 dos 18 aprovados já constavam aprovados em reinspeções anteriores (6 pela 2ª vez, 2 pela 3ª) — baixa líquida ≈ 10. Verificar por que a planilha não refletia.'},
+        {data:'28/08',dia:'sex',frente:'Reinspeção de entrega · seg. 1.4 / 1.5',inspecionadas:12,atendidas:8,naoAtendidas:4,aguardando:0,obs:'2 itens aprovados hoje não constavam como encerrados na planilha. (1º report dizia 6 aprovadas, corrigido para 8.)'}
+      ],
+      abertos:[
+        'Reinspeção de itens já aprovados: em 27/08, 8 dos 18 aprovados já tinham baixa em reinspeções anteriores — baixa líquida real ≈ 10.',
+        'Inspeção em campo não gera baixa no sistema; equipe vai remarcar até baixar. Ana + Carlos passam item a item 2×/semana; itens sem baixa = itens sem foto.',
+        'ID 1818 (protocolo de manifestação de superficiário) não é reinspeção — precisa de ação corretiva evidenciada junto de Implantação + RC.',
+        'Lista de ~12 IDs que precisam confirmar o KM. IDs 151 e 440 encerrados (protocolo) em 28/08.'
+      ]
+    },
+    'SOMAFEL/CMC':{
+      caminhadas:[],
+      abertos:[
+        'Grupo criado em 24/08. Somafel/CMC ficou de verificar a programação de inspeção com a equipe de produção e retornar.',
+        'Sem caminhada realizada nem IDs reportados na semana.'
+      ]
+    },
+    'GSA':{
+      caminhadas:[],
+      abertos:[
+        'Sem reinspeção na semana — GSA faria levantamento quantitativo e retornaria com a programação.',
+        'Equipe mobilizada no Km 7 tratando 2 não conformidades (RNC-08099/25 e RNC-08820/25): reparo de +1.200 m dos dois lados, no fundo da canaleta, previsto para a semana.'
+      ]
+    }
+  }
+};
+let psEmpresaAtual='EMPA';
+
+function psPctCls(p){ if(p>=80)return 'verde'; if(p>=60)return 'amarelo'; return 'vermelho'; }
+function psTotais(cam){
+  return (cam||[]).reduce((a,c)=>({
+    inspecionadas:a.inspecionadas+(+c.inspecionadas||0),
+    atendidas:a.atendidas+(+c.atendidas||0),
+    naoAtendidas:a.naoAtendidas+(+c.naoAtendidas||0),
+    aguardando:a.aguardando+(+c.aguardando||0)
+  }),{inspecionadas:0,atendidas:0,naoAtendidas:0,aguardando:0});
+}
+function psPctTxt(at,insp){ return insp>0?(Math.round(at/insp*1000)/10).toLocaleString('pt-BR')+'%':'—'; }
+function psCelPct(at,insp){
+  if(insp<=0)return '<span class="ps-pct">—</span>';
+  return '<span class="ps-pct '+psPctCls(at/insp*100)+'">'+psPctTxt(at,insp)+'</span>';
+}
+
+function psConsolidado(){
+  const linhas=PROG_SEMANAL_ORDER.map(emp=>{
+    const cam=(PROG_SEMANAL.empresas[emp]||{}).caminhadas||[];
+    return {emp:emp,n:cam.length,t:psTotais(cam)};
+  });
+  const comDados=linhas.filter(l=>l.n>0);
+  const G=comDados.reduce((a,l)=>({
+    inspecionadas:a.inspecionadas+l.t.inspecionadas,
+    atendidas:a.atendidas+l.t.atendidas,
+    naoAtendidas:a.naoAtendidas+l.t.naoAtendidas,
+    aguardando:a.aguardando+l.t.aguardando
+  }),{inspecionadas:0,atendidas:0,naoAtendidas:0,aguardando:0});
+
+  let h='<div class="ps-bloco"><h3>Consolidado da semana &mdash; '+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>'
+    +'<p class="ef-ajuda" style="margin-top:-2px">'+comDados.length+' de '+PROG_SEMANAL_ORDER.length+' empresas com caminhada de verificação registrada na semana.</p>'
+    +'<div class="kpis">'
+    +'<div class="kpi navy"><div class="rot">Inspecionadas</div><div class="val">'+G.inspecionadas+'</div><div class="sub">todas as empresas</div></div>'
+    +'<div class="kpi verde"><div class="rot">Atendidas</div><div class="val">'+G.atendidas+'</div><div class="sub">IDs fechadas</div></div>'
+    +'<div class="kpi vermelho"><div class="rot">Não atendidas</div><div class="val">'+G.naoAtendidas+'</div><div class="sub">voltam ao campo</div></div>'
+    +'<div class="kpi laranja"><div class="rot">Aguardando def.</div><div class="val">'+G.aguardando+'</div><div class="sub">RC / SIT / projeto</div></div>'
+    +'<div class="kpi azul"><div class="rot">Aderência global</div><div class="val">'+psPctTxt(G.atendidas,G.inspecionadas)+'</div><div class="sub">atendidas &divide; inspec.</div></div>'
+    +'</div>'
+    +'<div style="overflow-x:auto"><table class="ps-tab-caminhadas"><thead><tr>'
+    +'<th class="ps-l">Empresa</th><th>Caminhadas</th><th>Inspec.</th><th>Atend.</th><th>Não atend.</th><th>Aguard.</th><th>Aderência</th>'
+    +'</tr></thead><tbody>';
+  linhas.forEach(l=>{
+    if(l.n===0){
+      h+='<tr><td class="ps-l">'+escHtml(nomeExibicao(l.emp))+'</td><td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>'
+        +'<td><span class="ps-obs">sem caminhada</span></td></tr>';
+    }else{
+      h+='<tr><td class="ps-l">'+escHtml(nomeExibicao(l.emp))+'</td><td>'+l.n+'</td>'
+        +'<td>'+l.t.inspecionadas+'</td><td>'+l.t.atendidas+'</td><td>'+l.t.naoAtendidas+'</td><td>'+l.t.aguardando+'</td>'
+        +'<td>'+psCelPct(l.t.atendidas,l.t.inspecionadas)+'</td></tr>';
+    }
+  });
+  h+='</tbody><tfoot><tr><td class="ps-l">TOTAL</td><td>'+comDados.reduce((a,l)=>a+l.n,0)+'</td>'
+    +'<td>'+G.inspecionadas+'</td><td>'+G.atendidas+'</td><td>'+G.naoAtendidas+'</td><td>'+G.aguardando+'</td>'
+    +'<td>'+psCelPct(G.atendidas,G.inspecionadas)+'</td></tr></tfoot></table></div></div>';
+  return h;
+}
+
+function renderProgSemanal(){
+  const alvo=document.getElementById('main'); if(!alvo)return;
+  const PS=PROG_SEMANAL;
+  if(!PS.empresas[psEmpresaAtual])psEmpresaAtual=PROG_SEMANAL_ORDER[0];
+
+  let h='<p class="ef-ajuda">'+escHtml(PS.semanaLabel)+' · atualizado em '+escHtml(PS.atualizadoAte)+'. '+escHtml(PS.fonte)+'</p>';
+
+  h+=psConsolidado();
+
+  h+='<div class="ps-empnav">';
+  PROG_SEMANAL_ORDER.forEach(emp=>{
+    const dados=PS.empresas[emp]||{caminhadas:[]};
+    const temDados=(dados.caminhadas||[]).length>0;
+    const t=psTotais(dados.caminhadas);
+    h+='<button class="'+(emp===psEmpresaAtual?'ativa':'')+(temDados?'':' ps-vazia')+'" '
+      +'onclick="psSelecionarEmpresa(\''+String(emp).replace(/'/g,"\\'")+'\')">'
+      +escHtml(nomeExibicao(emp))
+      +'<span class="ps-badge">'+(temDados?psPctTxt(t.atendidas,t.inspecionadas):'s/ dados')+'</span></button>';
+  });
+  h+='</div>';
+
+  h+=psBlocoEmpresa(psEmpresaAtual);
+
+  h+='<div class="ps-legenda">'
+    +'<span><i style="background:var(--verde)"></i>Aderência &ge; 80%</span>'
+    +'<span><i style="background:var(--amarelo)"></i>60&ndash;79%</span>'
+    +'<span><i style="background:var(--vermelho)"></i>&lt; 60%</span></div>';
+
+  alvo.innerHTML=h;
+}
+
+function psBlocoEmpresa(emp){
+  const dados=PROG_SEMANAL.empresas[emp]||{caminhadas:[],abertos:[]};
+  const cam=dados.caminhadas||[];
+  let h='<div class="ps-bloco"><h3>'+escHtml(nomeExibicao(emp))+' &mdash; '+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>';
+
+  if(!cam.length){
+    h+='<div class="ps-vazio-msg">Sem caminhadas de verificação registradas nesta semana para '+escHtml(nomeExibicao(emp))+'.<br>'
+      +'Assim que os relatórios de caminhada forem consolidados, os indicadores aparecem aqui.</div>';
+    if((dados.abertos||[]).length){
+      h+='<div class="ps-abertos"><h4>Situação na semana</h4><ul>'
+        +dados.abertos.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div>';
+    }
+    h+='</div>';
+    return h;
+  }
+
+  const t=psTotais(cam);
+  h+='<div class="kpis">'
+    +'<div class="kpi navy"><div class="rot">Inspecionadas</div><div class="val">'+t.inspecionadas+'</div><div class="sub">'+cam.length+' caminhada(s)</div></div>'
+    +'<div class="kpi verde"><div class="rot">Atendidas</div><div class="val">'+t.atendidas+'</div><div class="sub">IDs fechadas</div></div>'
+    +'<div class="kpi vermelho"><div class="rot">Não atendidas</div><div class="val">'+t.naoAtendidas+'</div><div class="sub">voltam ao campo</div></div>'
+    +'<div class="kpi laranja"><div class="rot">Aguardando def.</div><div class="val">'+t.aguardando+'</div><div class="sub">RC / SIT / projeto</div></div>'
+    +'<div class="kpi azul"><div class="rot">Aderência</div><div class="val">'+psPctTxt(t.atendidas,t.inspecionadas)+'</div><div class="sub">atendidas &divide; inspec.</div></div>'
+    +'</div>';
+
+  h+='<div style="overflow-x:auto"><table class="ps-tab-caminhadas"><thead><tr>'
+    +'<th class="ps-l">Data</th><th>Dia</th><th class="ps-l">Frente / trecho</th>'
+    +'<th>Inspec.</th><th>Atend.</th><th>Não atend.</th><th>Aguard.</th><th>Aderência</th><th class="ps-l">Observação</th>'
+    +'</tr></thead><tbody>';
+  cam.forEach(c=>{
+    h+='<tr><td class="ps-l"><b>'+escHtml(c.data)+'</b></td><td>'+escHtml(c.dia||'')+'</td><td class="ps-l">'+escHtml(c.frente||'')+'</td>'
+      +'<td>'+(+c.inspecionadas||0)+'</td><td>'+(+c.atendidas||0)+'</td><td>'+(+c.naoAtendidas||0)+'</td><td>'+(+c.aguardando||0)+'</td>'
+      +'<td>'+psCelPct(+c.atendidas||0,+c.inspecionadas||0)+'</td>'
+      +'<td class="ps-l ps-obs">'+escHtml(c.obs||'—')+'</td></tr>';
+  });
+  h+='</tbody><tfoot><tr><td class="ps-l" colspan="3">TOTAL DA SEMANA</td>'
+    +'<td>'+t.inspecionadas+'</td><td>'+t.atendidas+'</td><td>'+t.naoAtendidas+'</td><td>'+t.aguardando+'</td>'
+    +'<td>'+psCelPct(t.atendidas,t.inspecionadas)+'</td><td class="ps-l"></td></tr></tfoot></table></div>';
+
+  if((dados.abertos||[]).length){
+    h+='<div class="ps-abertos"><h4>Pontos em aberto / riscos</h4><ul>'
+      +dados.abertos.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div>';
+  }
+  h+='</div>';
+  return h;
+}
+
+function psSelecionarEmpresa(emp){ psEmpresaAtual=emp; renderProgSemanal(); }
+
+renderProgSemanal();
+</script>
+</body>
+</html>
