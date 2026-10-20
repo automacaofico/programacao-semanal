@@ -48,7 +48,7 @@ h2.secao::before{content:"";width:5px;height:22px;border-radius:3px;
 
 .ef-ajuda{color:var(--cinza-txt);font-size:12px;margin:0 0 10px}
 
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:16px}
+.kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
 .kpi{background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm);position:relative;
   overflow:hidden;border:1px solid rgba(225,230,238,.7)}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
@@ -59,6 +59,7 @@ h2.secao::before{content:"";width:5px;height:22px;border-radius:3px;
 .kpi.verde::before{background:var(--verde)} .kpi.verde::after{background:var(--verde)}
 .kpi.vermelho::before{background:var(--vermelho)} .kpi.vermelho::after{background:var(--vermelho)}
 .kpi.navy::before{background:linear-gradient(180deg,var(--navy),var(--azul))} .kpi.navy::after{background:var(--navy)}
+.kpi.roxo::before{background:linear-gradient(180deg,#6B4C9A,#8E6FC0)} .kpi.roxo::after{background:#6B4C9A}
 .kpi .rot{font-size:10.5px;color:var(--cinza-txt);text-transform:uppercase;letter-spacing:.8px;font-weight:700;position:relative;z-index:2}
 .kpi .val{font-size:30px;font-weight:800;color:var(--navy);margin-top:6px;line-height:1;position:relative;z-index:2;
   font-variant-numeric:tabular-nums}
@@ -161,7 +162,99 @@ function psLogoImg(emp,cls){
 // ============================================================
 const PROG_SEMANAL_ORDER=['ÁPIA','CIVIL MASTER','EMPA','ATERPA','SOMAFEL/CMC','GSA'];
 
+// Programadas para inspeção — nº de IDs/pendências que as contratadas enviaram nos grupos de WhatsApp
+// para inspeção/reinspeção (listas de IDs, ou o nº de itens anunciado). Chave = semanaLabel da semana.
+// Itens: {data:'DD/MM', qtd:N, obs:'...'}. A soma por empresa vira o indicador “Programadas”.
+const PROG_SEMANAL_PROGRAMADAS={
+  'Semana 19 a 24/10/2026':{
+    'ÁPIA':[{data:'19/10',qtd:143,obs:'Programação semanal de atuação e baixa nos seg. 2.1 (66 IDs, km 92 ao 94) e 2.2 (77 IDs).'}],
+    'ATERPA':[{data:'19/10',qtd:18,obs:'Lista de IDs para a caminhada de 20/10 (a ID 1867 não tem foto no registro, mas está executada).'}]
+  },
+  'Semana 12 a 17/10/2026':{
+    'ÁPIA':[{data:'13/10',qtd:12,obs:'IDs do seg. 2.1 (km 92 a 100+680) para inspeção.'}],
+    'ATERPA':[{data:'14/10',qtd:29,obs:'Lista de IDs para a caminhada de 15/10.'}]
+  },
+  'Semana 05 a 10/10/2026':{
+    'ATERPA':[{data:'07/10',qtd:11,obs:'IDs do seg. 1.6 (km 58) para a caminhada de baixa de 08/10.'}]
+  },
+  'Semana 21 a 26/09/2026':{
+    'ATERPA':[{data:'22/09',qtd:11,obs:'IDs do seg. 1.4 (km 39) para reinspeção de 23/09, remarcada para as 13h.'}]
+  },
+  'Semana 07 a 12/09/2026':{
+    'ÁPIA':[
+      {data:'08/09',qtd:12,obs:'IDs do seg. 2.1 (km 95 a 97) fechadas pela equipe, para vistoria em 09/09.'},
+      {data:'09/09',qtd:10,obs:'IDs do km 97 (seg. 2.1) enviadas no fim do dia.'}
+    ],
+    'GSA':[{data:'11/09',qtd:4,obs:'RNC-08820/25, RNC-08838/25, RNC-08099/25 e ID 218, para reinspeção de 14/09.'}]
+  },
+  'Semana 01 a 05/09/2026':{
+    'EMPA':[{data:'01/09',qtd:7,obs:'IDs 908, 2787, 1930, 1934, 1103, 1104 e 1105, para inspeção de meio ambiente.'}],
+    'GSA':[{data:'31/08',qtd:3,obs:'IDs 212, 213 e 214 (km 7) para reinspeção de 01/09; a ID 218 (2 RNCs) segue em andamento.'}],
+    'ÁPIA':[{data:'02/09',qtd:7,obs:'IDs do seg. 2.1 (2312, 2313, 2314, 2315, 2316, 2251 e 2318) para reinspeção de 03/09.'}]
+  },
+  'Semana 24 a 29/08/2026':{
+    'EMPA':[
+      {data:'24/08',qtd:24,obs:'IDs solicitados para a reinspeção de 26/08.'},
+      {data:'27/08',qtd:15,obs:'Caminhada de 28/08 anunciada com 15 itens (IDs repassados em campo, não listados no grupo).'}
+    ],
+    'ÁPIA':[{data:'27/08',qtd:4,obs:'IDs 2221, 2223, 2225 e 2295 (seg. 2.1) resolvidas pela equipe, para vistoria.'}],
+    'ATERPA':[
+      {data:'24/08',qtd:42,obs:'Lista preliminar de itens a baixar na semana (36 IDs + 6 com km a confirmar), para double check da qualidade.'},
+      {data:'27/08',qtd:10,obs:'Reinspeção de 28/08 combinada com 10 itens (listas em PDF dos seg. 1.4 e 1.5 enviadas pela Aterpa).'}
+    ]
+  }
+};
+const psProgLista=emp=>((PROG_SEMANAL_PROGRAMADAS[PROG_SEMANAL.semanaLabel]||{})[emp]||[]);
+const psProgTotal=emp=>psProgLista(emp).reduce((a,x)=>a+(+x.qtd||0),0);
+function psProgHtml(emp){
+  const l=psProgLista(emp); if(!l.length)return '';
+  return '<div class="ps-abertos"><h4>Programadas para inspeção · IDs enviadas pela contratada no WhatsApp ('+psProgTotal(emp)+')</h4><ul>'
+    +l.map(x=>'<li><b>'+escHtml(x.data)+'</b> · '+(+x.qtd||0)+' ID(s) — '+escHtml(x.obs||'')+'</li>').join('')+'</ul></div>';
+}
 const PROG_SEMANAL_SEMANAS=[
+  {
+    semanaLabel:'Semana 19 a 24/10/2026',
+    atualizadoAte:'20/10/2026',
+    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” de cada empresa (exportados em 20/10/2026). Semana em andamento: ainda sem resultado de caminhada; constam as IDs programadas para inspeção enviadas pelas contratadas. Em 19/10 a VALE pediu a todos os grupos o envio da programação semanal de baixa de pendências — EMPA, Civil Master, Somafel, GSA e DR ainda não enviaram até o fechamento desta atualização.',
+    empresas:{
+      'EMPA':{
+        caminhadas:[],
+        abertos:[
+          'Programação semanal solicitada pela VALE em 19/10 — ainda não enviada no grupo.'
+        ]
+      },
+      'ÁPIA':{
+        caminhadas:[],
+        abertos:[
+          '19/10: programação semanal para atuação e baixa de pendências nos segmentos 2.1 (km 92 ao 94) e 2.2, com foco na execução das intervenções e na evolução das baixas ao longo da semana.'
+        ]
+      },
+      'ATERPA':{
+        caminhadas:[],
+        abertos:[
+          '19/10: lista de IDs para a caminhada de 20/10.'
+        ]
+      },
+      'CIVIL MASTER':{
+        caminhadas:[],
+        abertos:[
+          'Programação semanal solicitada pela VALE em 19/10 — ainda não enviada no grupo.'
+        ]
+      },
+      'SOMAFEL/CMC':{
+        caminhadas:[],
+        abertos:[
+          'Programação semanal solicitada pela VALE em 19/10 — ainda não enviada no grupo.'
+        ]
+      },
+      'GSA':{
+        caminhadas:[],
+        abertos:[
+          'Programação semanal solicitada pela VALE em 19/10 — ainda não enviada no grupo.'
+        ]
+      }
+    }
+  },
   {
     semanaLabel:'Semana 12 a 17/10/2026',
     atualizadoAte:'20/10/2026',
@@ -592,9 +685,10 @@ function psCelPct(at,insp){
 function psConsolidado(){
   const linhas=PROG_SEMANAL_ORDER.map(emp=>{
     const cam=(PROG_SEMANAL.empresas[emp]||{}).caminhadas||[];
-    return {emp:emp,n:cam.length,t:psTotais(cam)};
+    return {emp:emp,n:cam.length,t:psTotais(cam),p:psProgTotal(emp)};
   });
   const comDados=linhas.filter(l=>l.n>0);
+  const GP=linhas.reduce((a,l)=>a+l.p,0);
   const G=comDados.reduce((a,l)=>({
     inspecionadas:a.inspecionadas+l.t.inspecionadas,
     atendidas:a.atendidas+l.t.atendidas,
@@ -605,6 +699,7 @@ function psConsolidado(){
   let h='<div class="ps-bloco"><h3>Consolidado da semana &mdash; '+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>'
     +'<p class="ef-ajuda" style="margin-top:-2px">'+comDados.length+' de '+PROG_SEMANAL_ORDER.length+' empresas com caminhada de verificação registrada na semana.</p>'
     +'<div class="kpis">'
+    +'<div class="kpi roxo"><div class="rot">Programadas</div><div class="val">'+GP+'</div><div class="sub">IDs enviadas no WhatsApp</div></div>'
     +'<div class="kpi navy"><div class="rot">Inspecionadas</div><div class="val">'+G.inspecionadas+'</div><div class="sub">todas as empresas</div></div>'
     +'<div class="kpi verde"><div class="rot">Atendidas</div><div class="val">'+G.atendidas+'</div><div class="sub">IDs fechadas</div></div>'
     +'<div class="kpi vermelho"><div class="rot">Não atendidas</div><div class="val">'+G.naoAtendidas+'</div><div class="sub">voltam ao campo</div></div>'
@@ -612,20 +707,20 @@ function psConsolidado(){
     +'<div class="kpi azul"><div class="rot">Aderência global</div><div class="val">'+psPctTxt(G.atendidas,G.inspecionadas)+'</div><div class="sub">atendidas &divide; inspec.</div></div>'
     +'</div>'
     +'<div style="overflow-x:auto"><table class="ps-tab-caminhadas"><thead><tr>'
-    +'<th class="ps-l">Empresa</th><th>Caminhadas</th><th>Inspec.</th><th>Atend.</th><th>Não atend.</th><th>Aguard.</th><th>Aderência</th>'
+    +'<th class="ps-l">Empresa</th><th>Caminhadas</th><th>Programadas</th><th>Inspec.</th><th>Atend.</th><th>Não atend.</th><th>Aguard.</th><th>Aderência</th>'
     +'</tr></thead><tbody>';
   linhas.forEach(l=>{
     const cel='<td class="ps-l ps-emp">'+psLogoImg(l.emp)+escHtml(nomeExibicao(l.emp))+'</td>';
     if(l.n===0){
-      h+='<tr>'+cel+'<td>—</td><td>—</td><td>—</td><td>—</td><td>—</td>'
+      h+='<tr>'+cel+'<td>—</td><td>'+(l.p||'—')+'</td><td>—</td><td>—</td><td>—</td><td>—</td>'
         +'<td><span class="ps-obs">sem caminhada</span></td></tr>';
     }else{
-      h+='<tr>'+cel+'<td>'+l.n+'</td>'
+      h+='<tr>'+cel+'<td>'+l.n+'</td><td>'+(l.p||'—')+'</td>'
         +'<td>'+l.t.inspecionadas+'</td><td>'+l.t.atendidas+'</td><td>'+l.t.naoAtendidas+'</td><td>'+l.t.aguardando+'</td>'
         +'<td>'+psCelPct(l.t.atendidas,l.t.inspecionadas)+'</td></tr>';
     }
   });
-  h+='</tbody><tfoot><tr><td class="ps-l">TOTAL</td><td>'+comDados.reduce((a,l)=>a+l.n,0)+'</td>'
+  h+='</tbody><tfoot><tr><td class="ps-l">TOTAL</td><td>'+comDados.reduce((a,l)=>a+l.n,0)+'</td><td>'+(GP||'—')+'</td>'
     +'<td>'+G.inspecionadas+'</td><td>'+G.atendidas+'</td><td>'+G.naoAtendidas+'</td><td>'+G.aguardando+'</td>'
     +'<td>'+psCelPct(G.atendidas,G.inspecionadas)+'</td></tr></tfoot></table></div></div>';
   return h;
@@ -656,7 +751,7 @@ function renderProgSemanal(){
     h+='<button class="'+(emp===psEmpresaAtual?'ativa':'')+(temDados?'':' ps-vazia')+'" '
       +'onclick="psSelecionarEmpresa(\''+String(emp).replace(/'/g,"\\'")+'\')">'
       +psLogoImg(emp)+escHtml(nomeExibicao(emp))
-      +'<span class="ps-badge">'+(temDados?psPctTxt(t.atendidas,t.inspecionadas):'s/ dados')+'</span></button>';
+      +'<span class="ps-badge">'+(temDados?psPctTxt(t.atendidas,t.inspecionadas):(psProgTotal(emp)?psProgTotal(emp)+' progr.':'s/ dados'))+'</span></button>';
   });
   h+='</div>';
 
@@ -678,6 +773,7 @@ function psBlocoEmpresa(emp){
   if(!cam.length){
     h+='<div class="ps-vazio-msg">Sem caminhadas de verificação registradas nesta semana para '+escHtml(nomeExibicao(emp))+'.<br>'
       +'Assim que os relatórios de caminhada forem consolidados, os indicadores aparecem aqui.</div>';
+    h+=psProgHtml(emp);
     if((dados.abertos||[]).length){
       h+='<div class="ps-abertos"><h4>Situação na semana</h4><ul>'
         +dados.abertos.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div>';
@@ -688,6 +784,7 @@ function psBlocoEmpresa(emp){
 
   const t=psTotais(cam);
   h+='<div class="kpis">'
+    +'<div class="kpi roxo"><div class="rot">Programadas</div><div class="val">'+(psProgTotal(emp)||'—')+'</div><div class="sub">IDs enviadas no WhatsApp</div></div>'
     +'<div class="kpi navy"><div class="rot">Inspecionadas</div><div class="val">'+t.inspecionadas+'</div><div class="sub">'+cam.length+' caminhada(s)</div></div>'
     +'<div class="kpi verde"><div class="rot">Atendidas</div><div class="val">'+t.atendidas+'</div><div class="sub">IDs fechadas</div></div>'
     +'<div class="kpi vermelho"><div class="rot">Não atendidas</div><div class="val">'+t.naoAtendidas+'</div><div class="sub">voltam ao campo</div></div>'
@@ -709,6 +806,7 @@ function psBlocoEmpresa(emp){
     +'<td>'+t.inspecionadas+'</td><td>'+t.atendidas+'</td><td>'+t.naoAtendidas+'</td><td>'+t.aguardando+'</td>'
     +'<td>'+psCelPct(t.atendidas,t.inspecionadas)+'</td><td class="ps-l"></td></tr></tfoot></table></div>';
 
+  h+=psProgHtml(emp);
   if((dados.abertos||[]).length){
     h+='<div class="ps-abertos"><h4>Pontos em aberto / riscos</h4><ul>'
       +dados.abertos.map(x=>'<li>'+escHtml(x)+'</li>').join('')+'</ul></div>';
