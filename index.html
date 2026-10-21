@@ -67,7 +67,8 @@ h2.secao::before{content:"";width:5px;height:22px;border-radius:3px;
 .kpi .sub{font-size:11px;color:var(--cinza-txt);margin-top:4px;position:relative;z-index:2}
 @media(max-width:1000px){.kpis{grid-template-columns:repeat(2,1fr)}}
 
-.ps-semnav{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px}
+.ps-semnav{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 16px;align-items:center}
+.ps-dia-lbl{font-size:12px;font-weight:700;color:var(--cinza-txt);text-transform:uppercase;letter-spacing:.5px;margin-right:2px}
 .ps-semnav button{border:1px solid var(--cinza-borda);background:#fff;color:var(--cinza-txt);
   padding:7px 15px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;font-family:inherit;
   transition:background .15s,color .15s,border-color .15s}
@@ -205,7 +206,7 @@ const PROG_SEMANAL_PROGRAMADAS={
     ]
   }
 };
-const psProgLista=emp=>((PROG_SEMANAL_PROGRAMADAS[PROG_SEMANAL.semanaLabel]||{})[emp]||[]);
+const psProgLista=emp=>((PROG_SEMANAL_PROGRAMADAS[PROG_SEMANAL.semanaLabel]||{})[emp]||[]).filter(x=>!psDiaSel||x.data===psDiaSel);
 const psProgTotal=emp=>psProgLista(emp).reduce((a,x)=>a+(+x.qtd||0),0);
 function psProgHtml(emp){
   const l=psProgLista(emp); if(!l.length)return '';
@@ -669,6 +670,7 @@ const PROG_SEMANAL_SEMANAS=[
 ];
 
 let psSemanaIdx=0;
+let psDiaSel=null; // 'DD/MM' do filtro diário (null = semana toda)
 let PROG_SEMANAL=PROG_SEMANAL_SEMANAS[psSemanaIdx];
 let psEmpresaAtual='EMPA';
 
@@ -691,8 +693,9 @@ function psCelPct(at,insp){
 //  Solicitado = IDs levadas à reinspeção nos reports de caminhada (IDs inspecionadas);
 //  Atendido = IDs fechadas na reinspeção; Não atendido = IDs não fechadas (inclui as aguardando RC / SIT / projeto);
 //  Aderência = Atendido ÷ Solicitado. As IDs enviadas no WhatsApp (programadas) ficam só como lista informativa.
+const psCamDia=emp=>((PROG_SEMANAL.empresas[emp]||{}).caminhadas||[]).filter(c=>!psDiaSel||c.data===psDiaSel);
 function psResumo(emp){
-  const cam=(PROG_SEMANAL.empresas[emp]||{}).caminhadas||[];
+  const cam=psCamDia(emp);
   const t=psTotais(cam);
   return {n:cam.length,p:psProgTotal(emp),sol:t.inspecionadas,at:t.atendidas,nao:t.naoAtendidas+t.aguardando};
 }
@@ -708,8 +711,8 @@ function psConsolidado(){
   const G=linhas.reduce((a,l)=>({sol:a.sol+l.sol,at:a.at+l.at,nao:a.nao+l.nao}),{sol:0,at:0,nao:0});
   const comSol=linhas.filter(l=>l.sol>0).length;
   const v=x=>x>0?x:'—';
-  let h='<div class="ps-bloco"><h3>Consolidado da semana &mdash; '+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>'
-    +'<p class="ef-ajuda" style="margin-top:-2px">'+comSol+' de '+PROG_SEMANAL_ORDER.length+' empresas com reinspeção registrada na semana.</p>'
+  let h='<div class="ps-bloco"><h3>'+(psDiaSel?'Consolidado do dia '+escHtml(psDiaSel)+' &mdash; ':'Consolidado da semana &mdash; ')+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>'
+    +'<p class="ef-ajuda" style="margin-top:-2px">'+comSol+' de '+PROG_SEMANAL_ORDER.length+' empresas com reinspeção registrada '+(psDiaSel?'no dia':'na semana')+'.</p>'
     +psKpi4(G.sol,G.at,G.nao)
     +'<div style="overflow-x:auto"><table class="ps-tab-caminhadas"><thead><tr>'
     +'<th class="ps-l">Empresa</th><th>Solicitado</th><th>Atendido</th><th>Não atendido</th><th>Aderência</th>'
@@ -721,6 +724,24 @@ function psConsolidado(){
   });
   h+='</tbody><tfoot><tr><td class="ps-l">TOTAL</td><td>'+v(G.sol)+'</td><td>'+G.at+'</td><td>'+G.nao+'</td><td>'+psCelPct(G.at,G.sol)+'</td></tr></tfoot></table></div></div>';
   return h;
+}
+// Filtro diário: dias da semana com reinspeção ou lista de IDs registradas.
+function psDiasDaSemana(){
+  const mapa={};
+  PROG_SEMANAL_ORDER.forEach(emp=>{
+    ((PROG_SEMANAL.empresas[emp]||{}).caminhadas||[]).forEach(c=>{mapa[c.data]=c.dia||mapa[c.data]||'';});
+    ((PROG_SEMANAL_PROGRAMADAS[PROG_SEMANAL.semanaLabel]||{})[emp]||[]).forEach(x=>{ if(!(x.data in mapa))mapa[x.data]=''; });
+  });
+  const sem=['dom','seg','ter','qua','qui','sex','sáb'];
+  return Object.keys(mapa).sort((a,b)=>{const [da,ma]=a.split('/').map(Number),[db,mb]=b.split('/').map(Number);return (ma-mb)||(da-db);})
+    .map(d=>{const [dd,mm]=d.split('/').map(Number);return {data:d,dia:mapa[d]||sem[new Date(2026,mm-1,dd).getDay()]};});
+}
+function psDiasHtml(){
+  const dias=psDiasDaSemana(); if(!dias.length)return '';
+  return '<div class="ps-semnav" style="margin-top:-4px"><span class="ps-dia-lbl">Filtrar por dia:</span>'
+    +'<button class="'+(!psDiaSel?'ativa':'')+'" onclick="psSelecionarDia(null)">Semana toda</button>'
+    +dias.map(d=>'<button class="'+(psDiaSel===d.data?'ativa':'')+'" onclick="psSelecionarDia(\''+d.data+'\')">'+escHtml(d.data)+' · '+escHtml(d.dia)+'</button>').join('')
+    +'</div>';
 }
 function renderProgSemanal(){
   const alvo=document.getElementById('main'); if(!alvo)return;
@@ -737,13 +758,14 @@ function renderProgSemanal(){
 
   h+='<p class="ef-ajuda">'+escHtml(PS.semanaLabel)+' · atualizado em '+escHtml(PS.atualizadoAte)+'. '+escHtml(PS.fonte)+'</p>';
 
+  h+=psDiasHtml();
   h+=psConsolidado();
 
   h+='<div class="ps-empnav">';
   PROG_SEMANAL_ORDER.forEach(emp=>{
     const dados=PS.empresas[emp]||{caminhadas:[]};
-    const temDados=(dados.caminhadas||[]).length>0;
-    const t=psTotais(dados.caminhadas);
+    const temDados=psCamDia(emp).length>0;
+    const t=psTotais(psCamDia(emp));
     h+='<button class="'+(emp===psEmpresaAtual?'ativa':'')+(temDados?'':' ps-vazia')+'" '
       +'onclick="psSelecionarEmpresa(\''+String(emp).replace(/'/g,"\\'")+'\')">'
       +psLogoImg(emp)+escHtml(nomeExibicao(emp))
@@ -763,11 +785,11 @@ function renderProgSemanal(){
 
 function psBlocoEmpresa(emp){
   const dados=PROG_SEMANAL.empresas[emp]||{caminhadas:[],abertos:[]};
-  const cam=dados.caminhadas||[];
+  const cam=psCamDia(emp);
   let h='<div class="ps-bloco"><h3>'+psLogoImg(emp,'ps-logo-h')+escHtml(nomeExibicao(emp))+' &mdash; '+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>';
 
   if(!cam.length){
-    h+='<div class="ps-vazio-msg">Sem caminhadas de verificação registradas nesta semana para '+escHtml(nomeExibicao(emp))+'.<br>'
+    h+='<div class="ps-vazio-msg">Sem caminhadas de verificação registradas '+(psDiaSel?'no dia '+escHtml(psDiaSel):'nesta semana')+' para '+escHtml(nomeExibicao(emp))+'.<br>'
       +'Assim que os relatórios de caminhada forem consolidados, os indicadores aparecem aqui.</div>';
     h+=psProgHtml(emp);
     if((dados.abertos||[]).length){
@@ -791,7 +813,7 @@ function psBlocoEmpresa(emp){
       +'<td>'+psCelPct(+c.atendidas||0,+c.inspecionadas||0)+'</td>'
       +'<td class="ps-l ps-obs">'+escHtml(c.obs||'—')+'</td></tr>';
   });
-  h+='</tbody><tfoot><tr><td class="ps-l" colspan="3">TOTAL DA SEMANA</td>'
+  h+='</tbody><tfoot><tr><td class="ps-l" colspan="3">'+(psDiaSel?'TOTAL DO DIA':'TOTAL DA SEMANA')+'</td>'
     +'<td>'+t.inspecionadas+'</td><td>'+t.atendidas+'</td><td>'+(t.naoAtendidas+t.aguardando)+'</td>'
     +'<td>'+psCelPct(t.atendidas,t.inspecionadas)+'</td><td class="ps-l"></td></tr></tfoot></table></div>';
   h+=psProgHtml(emp);
@@ -804,7 +826,8 @@ function psBlocoEmpresa(emp){
 }
 
 function psSelecionarEmpresa(emp){ psEmpresaAtual=emp; renderProgSemanal(); }
-function psSelecionarSemana(i){ psSemanaIdx=i; renderProgSemanal(); }
+function psSelecionarSemana(i){ psSemanaIdx=i; psDiaSel=null; renderProgSemanal(); }
+function psSelecionarDia(d){ psDiaSel=d; renderProgSemanal(); }
 
 renderProgSemanal();
 </script>
