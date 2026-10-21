@@ -49,6 +49,7 @@ h2.secao::before{content:"";width:5px;height:22px;border-radius:3px;
 .ef-ajuda{color:var(--cinza-txt);font-size:12px;margin:0 0 10px}
 
 .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:16px}
+.kpis.quatro{grid-template-columns:repeat(4,1fr)}
 .kpi{background:#fff;border-radius:16px;padding:20px 22px;box-shadow:var(--sh-sm);position:relative;
   overflow:hidden;border:1px solid rgba(225,230,238,.7)}
 .kpi::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px}
@@ -214,8 +215,8 @@ function psProgHtml(emp){
 const PROG_SEMANAL_SEMANAS=[
   {
     semanaLabel:'Semana 19 a 24/10/2026',
-    atualizadoAte:'20/10/2026',
-    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” de cada empresa (exportados em 20/10/2026). Semana em andamento: ainda sem resultado de caminhada; constam as IDs programadas para inspeção enviadas pelas contratadas. Em 19/10 a VALE pediu a todos os grupos o envio da programação semanal de baixa de pendências — EMPA, Civil Master, Somafel, GSA e DR ainda não enviaram até o fechamento desta atualização.',
+    atualizadoAte:'21/10/2026',
+    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” de cada empresa (exportados em 20/10/2026) e reports de reinspeção de 20/10 (ÁPIA e ATERPA). Semana em andamento: constam também as IDs programadas para inspeção enviadas pelas contratadas. Em 19/10 a VALE pediu a todos os grupos o envio da programação semanal de baixa de pendências — EMPA, Civil Master, Somafel, GSA e DR ainda não enviaram até o fechamento desta atualização.',
     empresas:{
       'EMPA':{
         caminhadas:[],
@@ -224,13 +225,17 @@ const PROG_SEMANAL_SEMANAS=[
         ]
       },
       'ÁPIA':{
-        caminhadas:[],
+        caminhadas:[
+          {data:'20/10',dia:'ter',frente:'Reinspeção Pacote 03 · Seg. 1.7',inspecionadas:1,atendidas:1,naoAtendidas:0,aguardando:0,obs:'ID 1329 fechada.'}
+        ],
         abertos:[
           '19/10: programação semanal para atuação e baixa de pendências nos segmentos 2.1 (km 92 ao 94) e 2.2, com foco na execução das intervenções e na evolução das baixas ao longo da semana.'
         ]
       },
       'ATERPA':{
-        caminhadas:[],
+        caminhadas:[
+          {data:'20/10',dia:'ter',frente:'Reinspeção Pacote 02',inspecionadas:14,atendidas:5,naoAtendidas:9,aguardando:0,obs:'Aceitas (RC): 588, 1882, 676, 501 e 1818 — a 1818 já constava encerrada. Não aceitas: 1867, 1868, 1869, 1893, 511, 782, 783, 784 e 1883.'}
+        ],
         abertos:[
           '19/10: lista de IDs para a caminhada de 20/10.'
         ]
@@ -682,50 +687,41 @@ function psCelPct(at,insp){
   return '<span class="ps-pct '+psPctCls(at/insp*100)+'">'+psPctTxt(at,insp)+'</span>';
 }
 
-function psConsolidado(){
-  const linhas=PROG_SEMANAL_ORDER.map(emp=>{
-    const cam=(PROG_SEMANAL.empresas[emp]||{}).caminhadas||[];
-    return {emp:emp,n:cam.length,t:psTotais(cam),p:psProgTotal(emp)};
-  });
-  const comDados=linhas.filter(l=>l.n>0);
-  const GP=linhas.reduce((a,l)=>a+l.p,0);
-  const G=comDados.reduce((a,l)=>({
-    inspecionadas:a.inspecionadas+l.t.inspecionadas,
-    atendidas:a.atendidas+l.t.atendidas,
-    naoAtendidas:a.naoAtendidas+l.t.naoAtendidas,
-    aguardando:a.aguardando+l.t.aguardando
-  }),{inspecionadas:0,atendidas:0,naoAtendidas:0,aguardando:0});
+// Indicadores da página: Solicitado | Atendido | Não atendido | Aderência.
+//  Solicitado = IDs levadas à reinspeção nos reports de caminhada (IDs inspecionadas);
+//  Atendido = IDs fechadas na reinspeção; Não atendido = IDs não fechadas (inclui as aguardando RC / SIT / projeto);
+//  Aderência = Atendido ÷ Solicitado. As IDs enviadas no WhatsApp (programadas) ficam só como lista informativa.
+function psResumo(emp){
+  const cam=(PROG_SEMANAL.empresas[emp]||{}).caminhadas||[];
+  const t=psTotais(cam);
+  return {n:cam.length,p:psProgTotal(emp),sol:t.inspecionadas,at:t.atendidas,nao:t.naoAtendidas+t.aguardando};
+}
+const psKpi4=(sol,at,nao)=>'<div class="kpis quatro">'
+  +'<div class="kpi navy"><div class="rot">Solicitado</div><div class="val">'+sol+'</div><div class="sub">IDs levadas à reinspeção</div></div>'
+  +'<div class="kpi verde"><div class="rot">Atendido</div><div class="val">'+at+'</div><div class="sub">IDs fechadas</div></div>'
+  +'<div class="kpi vermelho"><div class="rot">Não atendido</div><div class="val">'+nao+'</div><div class="sub">voltam ao campo / aguardam</div></div>'
+  +'<div class="kpi azul"><div class="rot">Aderência</div><div class="val">'+psPctTxt(at,sol)+'</div><div class="sub">atendido &divide; solicitado</div></div>'
+  +'</div>';
 
+function psConsolidado(){
+  const linhas=PROG_SEMANAL_ORDER.map(emp=>Object.assign({emp:emp},psResumo(emp)));
+  const G=linhas.reduce((a,l)=>({sol:a.sol+l.sol,at:a.at+l.at,nao:a.nao+l.nao}),{sol:0,at:0,nao:0});
+  const comSol=linhas.filter(l=>l.sol>0).length;
+  const v=x=>x>0?x:'—';
   let h='<div class="ps-bloco"><h3>Consolidado da semana &mdash; '+escHtml(PROG_SEMANAL.semanaLabel)+'</h3>'
-    +'<p class="ef-ajuda" style="margin-top:-2px">'+comDados.length+' de '+PROG_SEMANAL_ORDER.length+' empresas com caminhada de verificação registrada na semana.</p>'
-    +'<div class="kpis">'
-    +'<div class="kpi roxo"><div class="rot">Programadas</div><div class="val">'+GP+'</div><div class="sub">IDs enviadas no WhatsApp</div></div>'
-    +'<div class="kpi navy"><div class="rot">Inspecionadas</div><div class="val">'+G.inspecionadas+'</div><div class="sub">todas as empresas</div></div>'
-    +'<div class="kpi verde"><div class="rot">Atendidas</div><div class="val">'+G.atendidas+'</div><div class="sub">IDs fechadas</div></div>'
-    +'<div class="kpi vermelho"><div class="rot">Não atendidas</div><div class="val">'+G.naoAtendidas+'</div><div class="sub">voltam ao campo</div></div>'
-    +'<div class="kpi laranja"><div class="rot">Aguardando def.</div><div class="val">'+G.aguardando+'</div><div class="sub">RC / SIT / projeto</div></div>'
-    +'<div class="kpi azul"><div class="rot">Aderência global</div><div class="val">'+psPctTxt(G.atendidas,G.inspecionadas)+'</div><div class="sub">atendidas &divide; inspec.</div></div>'
-    +'</div>'
+    +'<p class="ef-ajuda" style="margin-top:-2px">'+comSol+' de '+PROG_SEMANAL_ORDER.length+' empresas com reinspeção registrada na semana.</p>'
+    +psKpi4(G.sol,G.at,G.nao)
     +'<div style="overflow-x:auto"><table class="ps-tab-caminhadas"><thead><tr>'
-    +'<th class="ps-l">Empresa</th><th>Caminhadas</th><th>Programadas</th><th>Inspec.</th><th>Atend.</th><th>Não atend.</th><th>Aguard.</th><th>Aderência</th>'
+    +'<th class="ps-l">Empresa</th><th>Solicitado</th><th>Atendido</th><th>Não atendido</th><th>Aderência</th>'
     +'</tr></thead><tbody>';
   linhas.forEach(l=>{
-    const cel='<td class="ps-l ps-emp">'+psLogoImg(l.emp)+escHtml(nomeExibicao(l.emp))+'</td>';
-    if(l.n===0){
-      h+='<tr>'+cel+'<td>—</td><td>'+(l.p||'—')+'</td><td>—</td><td>—</td><td>—</td><td>—</td>'
-        +'<td><span class="ps-obs">sem caminhada</span></td></tr>';
-    }else{
-      h+='<tr>'+cel+'<td>'+l.n+'</td><td>'+(l.p||'—')+'</td>'
-        +'<td>'+l.t.inspecionadas+'</td><td>'+l.t.atendidas+'</td><td>'+l.t.naoAtendidas+'</td><td>'+l.t.aguardando+'</td>'
-        +'<td>'+psCelPct(l.t.atendidas,l.t.inspecionadas)+'</td></tr>';
-    }
+    h+='<tr><td class="ps-l ps-emp">'+psLogoImg(l.emp)+escHtml(nomeExibicao(l.emp))+'</td>'
+      +'<td>'+v(l.sol)+'</td><td>'+(l.n?l.at:'—')+'</td><td>'+(l.n?l.nao:'—')+'</td>'
+      +'<td>'+(l.sol?psCelPct(l.at,l.sol):'<span class="ps-obs">sem reinspeção</span>')+'</td></tr>';
   });
-  h+='</tbody><tfoot><tr><td class="ps-l">TOTAL</td><td>'+comDados.reduce((a,l)=>a+l.n,0)+'</td><td>'+(GP||'—')+'</td>'
-    +'<td>'+G.inspecionadas+'</td><td>'+G.atendidas+'</td><td>'+G.naoAtendidas+'</td><td>'+G.aguardando+'</td>'
-    +'<td>'+psCelPct(G.atendidas,G.inspecionadas)+'</td></tr></tfoot></table></div></div>';
+  h+='</tbody><tfoot><tr><td class="ps-l">TOTAL</td><td>'+v(G.sol)+'</td><td>'+G.at+'</td><td>'+G.nao+'</td><td>'+psCelPct(G.at,G.sol)+'</td></tr></tfoot></table></div></div>';
   return h;
 }
-
 function renderProgSemanal(){
   const alvo=document.getElementById('main'); if(!alvo)return;
   PROG_SEMANAL=PROG_SEMANAL_SEMANAS[psSemanaIdx];
@@ -751,17 +747,17 @@ function renderProgSemanal(){
     h+='<button class="'+(emp===psEmpresaAtual?'ativa':'')+(temDados?'':' ps-vazia')+'" '
       +'onclick="psSelecionarEmpresa(\''+String(emp).replace(/'/g,"\\'")+'\')">'
       +psLogoImg(emp)+escHtml(nomeExibicao(emp))
-      +'<span class="ps-badge">'+(temDados?psPctTxt(t.atendidas,t.inspecionadas):(psProgTotal(emp)?psProgTotal(emp)+' progr.':'s/ dados'))+'</span></button>';
+      +'<span class="ps-badge">'+(psResumo(emp).sol?psResumo(emp).sol+' solic.':'s/ dados')+'</span></button>';
   });
   h+='</div>';
 
   h+=psBlocoEmpresa(psEmpresaAtual);
 
+  h+='<p class="ef-ajuda" style="margin-top:14px">Solicitado = IDs levadas à reinspeção nos reports de caminhada. Atendido = IDs fechadas na reinspeção. Não atendido = IDs não fechadas (inclui as aguardando RC / SIT / projeto). Aderência = Atendido ÷ Solicitado. As IDs enviadas pela contratada no WhatsApp aparecem como lista informativa (“Programadas para inspeção”), sem entrar nos indicadores.</p>';
   h+='<div class="ps-legenda">'
     +'<span><i style="background:var(--verde)"></i>Aderência &ge; 80%</span>'
     +'<span><i style="background:var(--amarelo)"></i>60&ndash;79%</span>'
     +'<span><i style="background:var(--vermelho)"></i>&lt; 60%</span></div>';
-
   alvo.innerHTML=h;
 }
 
@@ -782,30 +778,22 @@ function psBlocoEmpresa(emp){
     return h;
   }
 
-  const t=psTotais(cam);
-  h+='<div class="kpis">'
-    +'<div class="kpi roxo"><div class="rot">Programadas</div><div class="val">'+(psProgTotal(emp)||'—')+'</div><div class="sub">IDs enviadas no WhatsApp</div></div>'
-    +'<div class="kpi navy"><div class="rot">Inspecionadas</div><div class="val">'+t.inspecionadas+'</div><div class="sub">'+cam.length+' caminhada(s)</div></div>'
-    +'<div class="kpi verde"><div class="rot">Atendidas</div><div class="val">'+t.atendidas+'</div><div class="sub">IDs fechadas</div></div>'
-    +'<div class="kpi vermelho"><div class="rot">Não atendidas</div><div class="val">'+t.naoAtendidas+'</div><div class="sub">voltam ao campo</div></div>'
-    +'<div class="kpi laranja"><div class="rot">Aguardando def.</div><div class="val">'+t.aguardando+'</div><div class="sub">RC / SIT / projeto</div></div>'
-    +'<div class="kpi azul"><div class="rot">Aderência</div><div class="val">'+psPctTxt(t.atendidas,t.inspecionadas)+'</div><div class="sub">atendidas &divide; inspec.</div></div>'
-    +'</div>';
+  const t=psTotais(cam), rs=psResumo(emp);
+  h+=psKpi4(rs.sol,rs.at,rs.nao);
 
   h+='<div style="overflow-x:auto"><table class="ps-tab-caminhadas"><thead><tr>'
     +'<th class="ps-l">Data</th><th>Dia</th><th class="ps-l">Frente / trecho</th>'
-    +'<th>Inspec.</th><th>Atend.</th><th>Não atend.</th><th>Aguard.</th><th>Aderência</th><th class="ps-l">Observação</th>'
+    +'<th>Solicitado</th><th>Atendido</th><th>Não atendido</th><th>Aderência</th><th class="ps-l">Observação</th>'
     +'</tr></thead><tbody>';
   cam.forEach(c=>{
     h+='<tr><td class="ps-l"><b>'+escHtml(c.data)+'</b></td><td>'+escHtml(c.dia||'')+'</td><td class="ps-l">'+escHtml(c.frente||'')+'</td>'
-      +'<td>'+(+c.inspecionadas||0)+'</td><td>'+(+c.atendidas||0)+'</td><td>'+(+c.naoAtendidas||0)+'</td><td>'+(+c.aguardando||0)+'</td>'
+      +'<td>'+(+c.inspecionadas||0)+'</td><td>'+(+c.atendidas||0)+'</td><td>'+((+c.naoAtendidas||0)+(+c.aguardando||0))+'</td>'
       +'<td>'+psCelPct(+c.atendidas||0,+c.inspecionadas||0)+'</td>'
       +'<td class="ps-l ps-obs">'+escHtml(c.obs||'—')+'</td></tr>';
   });
   h+='</tbody><tfoot><tr><td class="ps-l" colspan="3">TOTAL DA SEMANA</td>'
-    +'<td>'+t.inspecionadas+'</td><td>'+t.atendidas+'</td><td>'+t.naoAtendidas+'</td><td>'+t.aguardando+'</td>'
+    +'<td>'+t.inspecionadas+'</td><td>'+t.atendidas+'</td><td>'+(t.naoAtendidas+t.aguardando)+'</td>'
     +'<td>'+psCelPct(t.atendidas,t.inspecionadas)+'</td><td class="ps-l"></td></tr></tfoot></table></div>';
-
   h+=psProgHtml(emp);
   if((dados.abertos||[]).length){
     h+='<div class="ps-abertos"><h4>Pontos em aberto / riscos</h4><ul>'
