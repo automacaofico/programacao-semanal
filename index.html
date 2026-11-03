@@ -162,12 +162,15 @@ function psLogoImg(emp,cls){
 //   aguardando    = IDs travadas em terceiros (RC / SIT / projeto / NS)
 //   aderência (%) = atendidas ÷ inspecionadas
 // ============================================================
-const PROG_SEMANAL_ORDER=['ÁPIA','CIVIL MASTER','EMPA','ATERPA','SOMAFEL/CMC','GSA'];
+const PROG_SEMANAL_ORDER=['ÁPIA','CIVIL MASTER','EMPA','ATERPA','SOMAFEL/CMC','GSA','DR'];
 
 // Programadas para inspeção — nº de IDs/pendências que as contratadas enviaram nos grupos de WhatsApp
 // para inspeção/reinspeção (listas de IDs, ou o nº de itens anunciado). Chave = semanaLabel da semana.
 // Itens: {data:'DD/MM', qtd:N, obs:'...'}. A soma por empresa vira o indicador “Programadas”.
 const PROG_SEMANAL_PROGRAMADAS={
+  'Semana 26 a 31/10/2026':{
+    'ATERPA':[{data:'27/10',qtd:17,obs:'IDs enviadas pela ATERPA para reinspeção de 27/10: 15 já reinspecionadas anteriormente e enviadas para baixa (501, 537, 588, 727, 804, 882, 531, 535, 695, 712, 733, 461, 699, 786 e 183) e 2 pendentes de verificação (746 e 885).'}]
+  },
   'Semana 19 a 24/10/2026':{
     'ÁPIA':[{data:'19/10',qtd:141,obs:'Programação semanal de atuação e baixa nos seg. 2.1 (66 IDs, km 92 ao 94) e 2.2 (75 IDs).'}],
     'ATERPA':[{data:'19/10',qtd:18,obs:'Lista de IDs para a caminhada de 20/10 (a ID 1867 não tem foto no registro, mas está executada).'}]
@@ -215,9 +218,42 @@ function psProgHtml(emp){
 }
 const PROG_SEMANAL_SEMANAS=[
   {
+    semanaLabel:'Semana 26 a 31/10/2026',
+    atualizadoAte:'30/10/2026',
+    fonte:'Fonte: reports de reinspeção de 28/10 (DR), 29/10 (ÁPIA) e 30/10 (DR) e lista de IDs enviada pela ATERPA em 27/10. Sem report de reinspeção registrado nesta semana para EMPA, Civil Master, Somafel e GSA.',
+    empresas:{
+      'EMPA':{caminhadas:[],abertos:[]},
+      'ÁPIA':{
+        caminhadas:[
+          {data:'29/10',dia:'qui',frente:'Reinspeção Pacote 03 · Seg. 2.2 (km 102+000 a 104+000)',inspecionadas:3,atendidas:3,naoAtendidas:0,aguardando:0,obs:'IDs 2311, 2608 e 2604 fechadas. Nenhuma ID aguardando confirmação de SIT.'}
+        ],
+        abertos:[]
+      },
+      'ATERPA':{
+        caminhadas:[],
+        abertos:[
+          '27/10: lista de 17 IDs para reinspeção — 15 já reinspecionadas anteriormente e enviadas para baixa; as IDs 746 e 885 seguem pendentes de verificação.'
+        ]
+      },
+      'CIVIL MASTER':{caminhadas:[],abertos:[]},
+      'SOMAFEL/CMC':{caminhadas:[],abertos:[]},
+      'GSA':{caminhadas:[],abertos:[]},
+      'DR':{
+        caminhadas:[
+          {data:'28/10',dia:'qua',frente:'Reinspeção de tratativas de pendências de entrega · Pacote 02',inspecionadas:6,atendidas:3,naoAtendidas:3,aguardando:0,obs:'Aceitas: 1830, 1834 e 1833. Não aceitas: 1816, 1833 e 1826 (a ID 1833 consta nas duas listas do report).'},
+          {data:'30/10',dia:'sex',frente:'Reinspeção de tratativas de pendências de entrega',inspecionadas:5,atendidas:0,naoAtendidas:5,aguardando:0,obs:'5 itens não aceitos (IDs não informadas no report).'}
+        ],
+        abertos:[
+          '28/10: abertas novas pendências amarradas às IDs aprovadas — ID 1830 (trincas / acúmulo de água, km 38+170 ao 38+720, LD/LE) e ID 1834 (trincas / acúmulo de água, km 38+720 ao 39+680, LD/LE).',
+          '30/10: os 5 itens reinspecionados não foram aceitos e voltam para tratativa em campo.'
+        ]
+      }
+    }
+  },
+  {
     semanaLabel:'Semana 19 a 24/10/2026',
-    atualizadoAte:'21/10/2026',
-    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” de cada empresa (exportados em 20/10/2026) e reports de reinspeção de 20/10 (ÁPIA e ATERPA) e de 21/10 (ÁPIA). Semana em andamento: constam também as IDs programadas para inspeção enviadas pelas contratadas. Em 19/10 a VALE pediu a todos os grupos o envio da programação semanal de baixa de pendências — EMPA, Civil Master, Somafel, GSA e DR ainda não enviaram até o fechamento desta atualização.',
+    atualizadoAte:'24/10/2026',
+    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” de cada empresa (exportados em 20/10/2026) e reports de reinspeção de 20/10 (ÁPIA e ATERPA), de 21/10 (ÁPIA) e de 24/10 (ÁPIA). Semana em andamento: constam também as IDs programadas para inspeção enviadas pelas contratadas. Em 19/10 a VALE pediu a todos os grupos o envio da programação semanal de baixa de pendências — EMPA, Civil Master, Somafel, GSA e DR ainda não enviaram até o fechamento desta atualização.',
     empresas:{
       'EMPA':{
         caminhadas:[],
@@ -228,7 +264,9 @@ const PROG_SEMANAL_SEMANAS=[
       'ÁPIA':{
         caminhadas:[
           {data:'20/10',dia:'ter',frente:'Reinspeção Pacote 03 · Seg. 1.7',inspecionadas:1,atendidas:1,naoAtendidas:0,aguardando:0,obs:'ID 1329 fechada.'},
-          {data:'21/10',dia:'qua',frente:'Reinspeção Pacote 03 · Seg. 2.2 (km 100+300 a 100+600)',inspecionadas:2,atendidas:2,naoAtendidas:0,aguardando:0,obs:'IDs 2579 e 2664 fechadas.'}
+          {data:'21/10',dia:'qua',frente:'Reinspeção Pacote 03 · Seg. 2.2 (km 100+300 a 100+600)',inspecionadas:2,atendidas:2,naoAtendidas:0,aguardando:0,obs:'IDs 2579 e 2664 fechadas.'},
+          {data:'24/10',dia:'sáb',frente:'Reinspeção Pacote 03 · Seg. 1.7 (km 71+000 a 72+400)',inspecionadas:2,atendidas:2,naoAtendidas:0,aguardando:0,obs:'IDs 321 e 299 fechadas. Nenhuma ID aguardando confirmação de SIT.'},
+          {data:'24/10',dia:'sáb',frente:'Reinspeção Pacote 03 · Seg. 2.1 / 2.2 (km 82+000 a 102+000)',inspecionadas:7,atendidas:6,naoAtendidas:1,aguardando:0,obs:'Fechadas: 3234, 2277, 2321, 2326, 2327 e 2559. Não fechada: 2273. Nenhuma ID aguardando confirmação de SIT.'}
         ],
         abertos:[
           '19/10: programação semanal para atuação e baixa de pendências nos segmentos 2.1 (km 92 ao 94) e 2.2, com foco na execução das intervenções e na evolução das baixas ao longo da semana.'
