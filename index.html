@@ -168,6 +168,9 @@ const PROG_SEMANAL_ORDER=['ÁPIA','CIVIL MASTER','EMPA','ATERPA','SOMAFEL/CMC','
 // para inspeção/reinspeção (listas de IDs, ou o nº de itens anunciado). Chave = semanaLabel da semana.
 // Itens: {data:'DD/MM', qtd:N, obs:'...'}. A soma por empresa vira o indicador “Programadas”.
 const PROG_SEMANAL_PROGRAMADAS={
+  'Semana 16 a 21/11/2026':{
+    'SOMAFEL/CMC':[{data:'20/11',qtd:103,obs:'IDs enviadas com evidência fotográfica para baixa (Pacote 01, superestrutura); a VALE pediu que toda solicitação de baixa seja registrada no grupo.'}]
+  },
   'Semana 26 a 31/10/2026':{
     'ATERPA':[{data:'27/10',qtd:17,obs:'IDs enviadas pela ATERPA para reinspeção de 27/10: 15 já reinspecionadas anteriormente e enviadas para baixa (501, 537, 588, 727, 804, 882, 531, 535, 695, 712, 733, 461, 699, 786 e 183) e 2 pendentes de verificação (746 e 885).'}]
   },
@@ -217,6 +220,50 @@ function psProgHtml(emp){
     +l.map(x=>'<li><b>'+escHtml(x.data)+'</b> · '+(+x.qtd||0)+' ID(s) — '+escHtml(x.obs||'')+'</li>').join('')+'</ul></div>';
 }
 const PROG_SEMANAL_SEMANAS=[
+  {
+    semanaLabel:'Semana 16 a 21/11/2026',
+    atualizadoAte:'21/11/2026',
+    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” (exportados em 23/11/2026): reports de reinspeção de 16/11 (ÁPIA), 17/11 e 18/11 (GSA), 19/11 e 20/11 (SOMAFEL/CMC). Sem report de reinspeção nesta semana para ATERPA, DR, EMPA e Civil Master. As semanas de 02 a 14/11 não foram registradas (sem histórico dos grupos nesse período).',
+    empresas:{
+      'EMPA':{caminhadas:[],abertos:[]},
+      'ÁPIA':{
+        caminhadas:[
+          {data:'16/11',dia:'seg',frente:'Reinspeção Pacote 03 · Seg. 2.2',inspecionadas:23,atendidas:17,naoAtendidas:6,aguardando:0,obs:'Fechadas: 2619, 2642, 2683, 2726, 2691, 2723, 2725, 2641, 2649, 2650, 2595, 2643, 2596, 2599, 2677, 2710 e 2706. Não fechadas: 2722, 2665, 2621, 2692, 2696 e 2701. Nenhuma ID aguardando confirmação de SIT.'}
+        ],
+        abertos:[]
+      },
+      'ATERPA':{
+        caminhadas:[],
+        abertos:[
+          '18/11 e 19/11: a ATERPA informou tratamento de canaletas e conformação de talude (local com tráfego da Somafel) e tratamento de erosões no km 47 (hidrossemeadura e lona na berma); sem report de reinspeção no período.'
+        ]
+      },
+      'CIVIL MASTER':{caminhadas:[],abertos:[]},
+      'SOMAFEL/CMC':{
+        caminhadas:[
+          {data:'19/11',dia:'qui',frente:'Reinspeção Pacote 01 · Superestrutura · Seg. 1.2',inspecionadas:12,atendidas:8,naoAtendidas:4,aguardando:0,obs:'Fechadas: 2887, 2888, 2944, 2940, 2931, 2932, 2927 e 2933. Não fechadas: 2929, 2781, 2873 e 2886. Nenhuma ID aguardando confirmação de SIT.'},
+          {data:'20/11',dia:'sex',frente:'Reinspeção Pacote 01 · Superestrutura · Seg. 1.2',inspecionadas:20,atendidas:15,naoAtendidas:5,aguardando:0,obs:'Fechadas: 2959, 2964, 2966, 2970, 2971, 2988, 2989, 2990, 2991, 2995, 3071, 3072, 3099, 3119 e 3120. Não fechadas: 2961, 2972, 3070, 3075 e 3076. Nenhuma ID aguardando confirmação de SIT (report publicado em 23/11).'}
+        ],
+        abertos:[
+          '18/11: a VALE orientou que pendências ligadas a não conformidades sejam encerradas junto com as pendências principais (2924 encerrada mantendo a 2864; 2935 encerrada mantendo a 2934; 2778 e 2763 tratam de situações distintas) e pediu verificar a 2779.',
+          '20/11: lista de 103 IDs enviada para baixa, com evidências fotográficas; reinspeção prevista para a semana seguinte.'
+        ]
+      },
+      'GSA':{
+        caminhadas:[
+          {data:'17/11',dia:'ter',frente:'Reinspeção de tratativas de pendências de entrega · Pacote 01',inspecionadas:8,atendidas:4,naoAtendidas:4,aguardando:0,obs:'Aceitas: 1910, 1911, 1913 e 1918. Não fechadas: 2338 (erosão no talude, segue em aberto), 1925 (em verificação) e 1908 e 1914 (pendentes, aceitas na reinspeção de 18/11).'},
+          {data:'18/11',dia:'qua',frente:'Reinspeção de tratativas de pendências de entrega · Pacote 01',inspecionadas:2,atendidas:2,naoAtendidas:0,aguardando:0,obs:'Aceitas: 1908 e 1914, que haviam ficado pendentes na reinspeção de 17/11.'}
+        ],
+        abertos:[]
+      },
+      'DR':{
+        caminhadas:[],
+        abertos:[
+          '19/11: a VALE cobrou a programação de reinspeção; a DR informou ter IDs prontas para baixa.'
+        ]
+      }
+    }
+  },
   {
     semanaLabel:'Semana 26 a 31/10/2026',
     atualizadoAte:'30/10/2026',
