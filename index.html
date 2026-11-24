@@ -221,27 +221,49 @@ function psProgHtml(emp){
 }
 const PROG_SEMANAL_SEMANAS=[
   {
+    semanaLabel:'Semana 23 a 28/11/2026',
+    atualizadoAte:'23/11/2026',
+    fonte:'Fonte: Planilha de inspeção de 24/11/2026 (quantitativos por dia e empresa, sem lista de IDs). Semana em andamento: registros até 23/11. A planilha não traz a EMPA.',
+    empresas:{
+      'EMPA':{caminhadas:[],abertos:[]},
+      'ÁPIA':{caminhadas:[],abertos:[]},
+      'ATERPA':{caminhadas:[
+          {data:'23/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:6,atendidas:1,naoAtendidas:5,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'CIVIL MASTER':{caminhadas:[],abertos:[]},
+      'SOMAFEL/CMC':{caminhadas:[
+          {data:'23/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:17,atendidas:15,naoAtendidas:2,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'GSA':{caminhadas:[],abertos:[]},
+      'DR':{caminhadas:[],abertos:[]}
+    }
+  },
+  {
     semanaLabel:'Semana 16 a 21/11/2026',
     atualizadoAte:'21/11/2026',
-    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” (exportados em 23/11/2026): reports de reinspeção de 16/11 (ÁPIA), 17/11 e 18/11 (GSA), 19/11 e 20/11 (SOMAFEL/CMC). Sem report de reinspeção nesta semana para ATERPA, DR, EMPA e Civil Master. As semanas de 02 a 14/11 não foram registradas (sem histórico dos grupos nesse período).',
+    fonte:'Fonte: grupos de WhatsApp “Programação verificação pendências” (exportados em 23/11/2026), com as IDs, e Planilha de inspeção de 24/11/2026, com os quantitativos (incluiu ATERPA em 16/11 e 19/11 e ÁPIA em 19/11 e atualizou SOMAFEL/CMC em 19/11). Sem reinspeção registrada para DR, EMPA e Civil Master.',
     empresas:{
       'EMPA':{caminhadas:[],abertos:[]},
       'ÁPIA':{
         caminhadas:[
-          {data:'16/11',dia:'seg',frente:'Reinspeção Pacote 03 · Seg. 2.2',inspecionadas:23,atendidas:17,naoAtendidas:6,aguardando:0,obs:'Fechadas: 2619, 2642, 2683, 2726, 2691, 2723, 2725, 2641, 2649, 2650, 2595, 2643, 2596, 2599, 2677, 2710 e 2706. Não fechadas: 2722, 2665, 2621, 2692, 2696 e 2701. Nenhuma ID aguardando confirmação de SIT.'}
+          {data:'16/11',dia:'seg',frente:'Reinspeção Pacote 03 · Seg. 2.2',inspecionadas:23,atendidas:17,naoAtendidas:6,aguardando:0,obs:'Fechadas: 2619, 2642, 2683, 2726, 2691, 2723, 2725, 2641, 2649, 2650, 2595, 2643, 2596, 2599, 2677, 2710 e 2706. Não fechadas: 2722, 2665, 2621, 2692, 2696 e 2701. Nenhuma ID aguardando confirmação de SIT.'},
+          {data:'19/11',dia:'qui',frente:'Reinspeção de pendências',inspecionadas:13,atendidas:12,naoAtendidas:1,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
         ],
         abertos:[]
       },
       'ATERPA':{
-        caminhadas:[],
+        caminhadas:[
+          {data:'16/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:4,atendidas:3,naoAtendidas:1,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'},
+          {data:'19/11',dia:'qui',frente:'Reinspeção de pendências',inspecionadas:11,atendidas:6,naoAtendidas:5,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],
         abertos:[
-          '18/11 e 19/11: a ATERPA informou tratamento de canaletas e conformação de talude (local com tráfego da Somafel) e tratamento de erosões no km 47 (hidrossemeadura e lona na berma); sem report de reinspeção no período.'
+          '18/11 e 19/11: a ATERPA informou tratamento de canaletas e conformação de talude (local com tráfego da Somafel) e tratamento de erosões no km 47 (hidrossemeadura e lona na berma); sem report de reinspeção no grupo no período.'
         ]
       },
       'CIVIL MASTER':{caminhadas:[],abertos:[]},
       'SOMAFEL/CMC':{
         caminhadas:[
-          {data:'19/11',dia:'qui',frente:'Reinspeção Pacote 01 · Superestrutura · Seg. 1.2',inspecionadas:12,atendidas:8,naoAtendidas:4,aguardando:0,obs:'Fechadas: 2887, 2888, 2944, 2940, 2931, 2932, 2927 e 2933. Não fechadas: 2929, 2781, 2873 e 2886. Nenhuma ID aguardando confirmação de SIT.'},
+          {data:'19/11',dia:'qui',frente:'Reinspeção Pacote 01 · Superestrutura · Seg. 1.2',inspecionadas:15,atendidas:11,naoAtendidas:4,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (o report do grupo trazia 12 IDs, 8 fechadas; as outras 3 fechadas não estão listadas). Fechadas no report: 2887, 2888, 2944, 2940, 2931, 2932, 2927 e 2933. Não fechadas: 2929, 2781, 2873 e 2886. Nenhuma ID aguardando confirmação de SIT.'},
           {data:'20/11',dia:'sex',frente:'Reinspeção Pacote 01 · Superestrutura · Seg. 1.2',inspecionadas:20,atendidas:15,naoAtendidas:5,aguardando:0,obs:'Fechadas: 2959, 2964, 2966, 2970, 2971, 2988, 2989, 2990, 2991, 2995, 3071, 3072, 3099, 3119 e 3120. Não fechadas: 2961, 2972, 3070, 3075 e 3076. Nenhuma ID aguardando confirmação de SIT (report publicado em 23/11).'}
         ],
         abertos:[
@@ -262,6 +284,53 @@ const PROG_SEMANAL_SEMANAS=[
           '19/11: a VALE cobrou a programação de reinspeção; a DR informou ter IDs prontas para baixa.'
         ]
       }
+    }
+  },
+  {
+    semanaLabel:'Semana 09 a 14/11/2026',
+    atualizadoAte:'14/11/2026',
+    fonte:'Fonte: Planilha de inspeção de 24/11/2026 (quantitativos por dia e empresa, sem lista de IDs). Sem registro nesta semana para Civil Master e DR; a planilha não traz a EMPA.',
+    empresas:{
+      'EMPA':{caminhadas:[],abertos:[]},
+      'ÁPIA':{caminhadas:[
+          {data:'10/11',dia:'ter',frente:'Reinspeção de pendências',inspecionadas:9,atendidas:8,naoAtendidas:1,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'},
+          {data:'12/11',dia:'qui',frente:'Reinspeção de pendências',inspecionadas:13,atendidas:13,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'ATERPA':{caminhadas:[
+          {data:'11/11',dia:'qua',frente:'Reinspeção de pendências',inspecionadas:13,atendidas:9,naoAtendidas:4,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'},
+          {data:'12/11',dia:'qui',frente:'Reinspeção de pendências',inspecionadas:6,atendidas:5,naoAtendidas:1,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'},
+          {data:'13/11',dia:'sex',frente:'Reinspeção de pendências',inspecionadas:3,atendidas:3,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'CIVIL MASTER':{caminhadas:[],abertos:[]},
+      'SOMAFEL/CMC':{caminhadas:[
+          {data:'12/11',dia:'qui',frente:'Reinspeção de pendências',inspecionadas:9,atendidas:9,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'},
+          {data:'13/11',dia:'sex',frente:'Reinspeção de pendências',inspecionadas:3,atendidas:3,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'GSA':{caminhadas:[
+          {data:'13/11',dia:'sex',frente:'Reinspeção de pendências',inspecionadas:15,atendidas:5,naoAtendidas:10,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'DR':{caminhadas:[],abertos:[]}
+    }
+  },
+  {
+    semanaLabel:'Semana 02 a 07/11/2026',
+    atualizadoAte:'07/11/2026',
+    fonte:'Fonte: Planilha de inspeção de 24/11/2026 (quantitativos por dia e empresa, sem lista de IDs). Sem registro nesta semana para GSA, Civil Master e DR; a planilha não traz a EMPA.',
+    empresas:{
+      'EMPA':{caminhadas:[],abertos:[]},
+      'ÁPIA':{caminhadas:[
+          {data:'04/11',dia:'qua',frente:'Reinspeção de pendências',inspecionadas:18,atendidas:18,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'},
+          {data:'05/11',dia:'qui',frente:'Reinspeção de pendências',inspecionadas:7,atendidas:7,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'ATERPA':{caminhadas:[
+          {data:'06/11',dia:'sex',frente:'Reinspeção de pendências',inspecionadas:6,atendidas:6,naoAtendidas:0,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'CIVIL MASTER':{caminhadas:[],abertos:[]},
+      'SOMAFEL/CMC':{caminhadas:[
+          {data:'06/11',dia:'sex',frente:'Reinspeção de pendências',inspecionadas:11,atendidas:6,naoAtendidas:5,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
+      'GSA':{caminhadas:[],abertos:[]},
+      'DR':{caminhadas:[],abertos:[]}
     }
   },
   {
