@@ -222,20 +222,24 @@ function psProgHtml(emp){
 const PROG_SEMANAL_SEMANAS=[
   {
     semanaLabel:'Semana 23 a 28/11/2026',
-    atualizadoAte:'23/11/2026',
-    fonte:'Fonte: Planilha de inspeção de 24/11/2026 (quantitativos por dia e empresa, sem lista de IDs). Semana em andamento: registros até 23/11. A planilha não traz a EMPA.',
+    atualizadoAte:'24/11/2026',
+    fonte:'Fonte: Planilha de Inspeção Diária de 25/11/2026 (quantitativos por dia e empresa, sem lista de IDs), Pacotes 1 a 3. Semana em andamento: registros até 24/11. A planilha não traz a EMPA.',
     empresas:{
       'EMPA':{caminhadas:[],abertos:[]},
-      'ÁPIA':{caminhadas:[],abertos:[]},
+      'ÁPIA':{caminhadas:[
+          {data:'24/11',dia:'ter',frente:'Reinspeção Pacote 03',inspecionadas:13,atendidas:11,naoAtendidas:2,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 25/11/2026 (sem lista de IDs).'}
+        ],abertos:[]},
       'ATERPA':{caminhadas:[
-          {data:'23/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:6,atendidas:1,naoAtendidas:5,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+          {data:'23/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:6,atendidas:1,naoAtendidas:5,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 25/11/2026 (sem lista de IDs).'}
         ],abertos:[]},
       'CIVIL MASTER':{caminhadas:[],abertos:[]},
       'SOMAFEL/CMC':{caminhadas:[
-          {data:'23/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:17,atendidas:15,naoAtendidas:2,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 24/11/2026 (sem lista de IDs).'}
+          {data:'23/11',dia:'seg',frente:'Reinspeção de pendências',inspecionadas:17,atendidas:15,naoAtendidas:2,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 25/11/2026 (sem lista de IDs).'}
         ],abertos:[]},
       'GSA':{caminhadas:[],abertos:[]},
-      'DR':{caminhadas:[],abertos:[]}
+      'DR':{caminhadas:[
+          {data:'24/11',dia:'ter',frente:'Reinspeção de pendências',inspecionadas:4,atendidas:3,naoAtendidas:1,aguardando:0,obs:'Quantitativo da Planilha de inspeção de 25/11/2026 (sem lista de IDs).'}
+        ],abertos:[]}
     }
   },
   {
